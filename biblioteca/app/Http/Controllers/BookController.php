@@ -7,6 +7,7 @@ use App\Models\Publisher;
 use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Http\Request;
+use App\Models\User; // incluir
 
 class BookController extends Controller
 {
@@ -65,8 +66,8 @@ class BookController extends Controller
 
         return view('books.edit', compact('book', 'publishers', 'authors', 'categories'));
     }
-}
-public function update(Request $request, Book $book)
+
+    public function update(Request $request, Book $book)
 {
     $request->validate([
         'title' => 'required|string|max:255',
@@ -79,14 +80,7 @@ public function update(Request $request, Book $book)
 
     return redirect()->route('books.index')->with('success', 'Livro atualizado com sucesso.');
 }
-public function show(Book $book)
-{
-    // Carregando autor, editora e categoria do livro com eager loading
-    $book->load(['author', 'publisher', 'category']);
 
-    return view('books.show', compact('book'));
-
-}
 public function index()
 {
     // Carregar os livros com autores usando eager loading e paginação
@@ -94,4 +88,37 @@ public function index()
 
     return view('books.index', compact('books'));
 
+    
+
 }
+
+
+
+public function show(Book $book)
+{
+    // Carregando autor, editora e categoria do livro com eager loading
+    $book->load(['author', 'publisher', 'category']);
+
+    // Carregar todos os usuários para o formulário de empréstimo
+    $users = User::all();
+
+    return view('books.show', compact('book','users'));
+}
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
