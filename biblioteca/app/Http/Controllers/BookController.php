@@ -104,6 +104,12 @@ public function show(Book $book)
 
     return view('books.show', compact('book','users'));
 }
+public function destroy(Book $book)
+{
+    $book->delete();
+    return redirect()->route('books.index')->with('success', 'Livro excluído!');
+}
+
 }
 
 
