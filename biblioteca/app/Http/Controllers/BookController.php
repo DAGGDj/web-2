@@ -7,7 +7,8 @@ use App\Models\Publisher;
 use App\Models\Author;
 use App\Models\Category;
 use Illuminate\Http\Request;
-use App\Models\User; // incluir
+use App\Models\User;
+use Illuminate\Support\Facades\Storage;
 
 class BookController extends Controller
 {
@@ -25,9 +26,18 @@ class BookController extends Controller
             'publisher_id' => 'required|exists:publishers,id',
             'author_id' => 'required|exists:authors,id',
             'category_id' => 'required|exists:categories,id',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Book::create($request->all());
+         $bookData = $request->except('cover');
+        
+         if ($request->hasFile('cover')) {
+         Storage::disk('public')->makeDirectory('book-covers');
+    
+         $bookData['cover_path'] = $request->file('cover')->store('book-covers', 'public');
+        }
+
+        Book::create($bookData);
 
         return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
     }
@@ -50,9 +60,17 @@ class BookController extends Controller
             'publisher_id' => 'required|exists:publishers,id',
             'author_id' => 'required|exists:authors,id',
             'category_id' => 'required|exists:categories,id',
+            'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         ]);
 
-        Book::create($request->all());
+        $bookData = $request->except('cover');
+
+        if ($request->hasFile('cover')) {
+         Storage::disk('public')->makeDirectory('book-covers');
+    
+         $bookData['cover_path'] = $request->file('cover')->store('book-covers', 'public');
+        }
+        Book::create($bookData);
 
         return redirect()->route('books.index')->with('success', 'Livro criado com sucesso.');
     }
@@ -69,14 +87,33 @@ class BookController extends Controller
 
     public function update(Request $request, Book $book)
 {
+
     $request->validate([
         'title' => 'required|string|max:255',
         'publisher_id' => 'required|exists:publishers,id',
         'author_id' => 'required|exists:authors,id',
         'category_id' => 'required|exists:categories,id',
+        'cover' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
     ]);
 
-    $book->update($request->all());
+    $updateData = $request->except('cover','remove_cover');
+    $oldCoverPath = $book->cover_path;
+
+    if ($request->has('remove_cover') && $request->remove_cover == '1') {
+        $updateData['cover_path'] = null;
+    }
+
+    else if ($request->hasFile('cover')) {
+         Storage::disk('public')->makeDirectory('book-covers');
+    
+         $updateData['cover_path'] = $request->file('cover')->store('book-covers', 'public');
+          
+        }
+    $book->update($updateData);
+    
+    if (($request->hasFile('cover') || $request->has('remove_cover')) && $oldCoverPath && Storage::disk('public')->exists($oldCoverPath)) {
+        Storage::disk('public')->delete($oldCoverPath);
+    }
 
     return redirect()->route('books.index')->with('success', 'Livro atualizado com sucesso.');
 }
@@ -92,8 +129,6 @@ public function index()
 
 }
 
-
-
 public function show(Book $book)
 {
     // Carregando autor, editora e categoria do livro com eager loading
@@ -104,27 +139,15 @@ public function show(Book $book)
 
     return view('books.show', compact('book','users'));
 }
+
 public function destroy(Book $book)
 {
+    if ($book->cover_path && Storage::disk('public')->exists($book->cover_path)) {
+        Storage::disk('public')->delete($book->cover_path);
+    }
+    
     $book->delete();
     return redirect()->route('books.index')->with('success', 'Livro excluído!');
 }
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

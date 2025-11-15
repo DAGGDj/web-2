@@ -22,6 +22,7 @@ class AuthorPublisherBookSeeder extends Seeder
                 Book::factory(10)->make([
                     'category_id' => Category::inRandomOrder()->first()->id,
                     'publisher_id' => $publisher->id,
+                    'cover_path' => null,
                 ])->toArray()
             );
         });

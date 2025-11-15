@@ -18,7 +18,8 @@ class BookFactory extends Factory
             'author_id' => Author::factory(),
             'category_id' => Category::factory(), // Agora usa a CategoryFactory
             'publisher_id' => Publisher::factory(),
-            'published_year' => $this->faker->year
+            'published_year' => $this->faker->year,
+            'cover_path' => null,
         ];
     }
 }

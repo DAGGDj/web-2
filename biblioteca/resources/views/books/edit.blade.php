@@ -4,7 +4,7 @@
 <div class="container">
     <h1 class="my-4">Editar Livro</h1>
 
-    <form action="{{ route('books.update', $book) }}" method="POST">
+    <form action="{{ route('books.update', $book) }}" method="POST" enctype="multipart/form-data">
         @csrf
         @method('PUT')
         <div class="mb-3">
@@ -68,8 +68,34 @@
             @enderror
         </div>
 
-        <button type="submit" class="btn btn-success">Atualizar</button>
+<div class="mb-3">
+    <label for="cover" class="form-label fw-bold">Capa do Livro (Opcional)</label>
+    <input type="file" class="form-control" id="cover" name="cover" accept="image/*">
+    
+    @if($book->cover_path)
+        <div class="mt-2">
+            <p class="mb-1"><small>Imagem atual:</small></p>
+            <img src="{{ $book->cover_url }}" alt="Capa atual" class="img-thumbnail" style="max-width: 200px;">
+        </div>
+        <div class="mt-2">
+                <button type="button" class="btn btn-outline-danger btn-sm" onclick="document.getElementById('remove_cover').value = '1'">
+                    <i class="bi bi-trash"></i> Remover Capa
+                </button>
+                <input type="hidden" name="remove_cover" id="remove_cover" value="0">
+            </div>
+        </div>
+    @else
+        <div class="mt-2">
+            <p class="text-muted mb-1"><small>Nenhuma capa cadastrada</small></p>
+        </div>
+    @endif
+    </div>
+
+    <button type="submit" class="btn btn-success">Atualizar</button>
         <a href="{{ route('books.index') }}" class="btn btn-secondary">Cancelar</a>
+
     </form>
 </div>
+
+
 @endsection

@@ -9,7 +9,16 @@ class Book extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['title', 'author_id', 'category_id', 'publisher_id', 'published_year'];
+    protected $fillable = ['title', 'author_id', 'category_id', 'publisher_id', 'published_year', 'cover_path'];
+
+    public function getCoverUrlAttribute()
+{
+    if ($this->cover_path) {
+        return \Illuminate\Support\Facades\Storage::url($this->cover_path);
+    }
+    
+    return null;
+}
 
     public function author()
     {

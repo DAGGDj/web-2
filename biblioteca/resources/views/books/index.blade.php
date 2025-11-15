@@ -20,6 +20,7 @@
     <table class="table table-striped">
         <thead>
             <tr>
+                <th>Capa</th>
                 <th>ID</th>
                 <th>Título</th>
                 <th>Autor</th>
@@ -29,6 +30,15 @@
         <tbody>
             @forelse($books as $book)
                 <tr>
+                    <td>
+                        @if($book->cover_path)
+                            <img src="{{ $book->cover_url }}" alt="Capa" style="max-width: 50px; max-height: 70px; object-fit: cover;">
+                        @else
+                            <div style="width: 50px; height: 70px; background: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 10px; color: #666;">
+                                Sem capa
+                            </div>
+                        @endif
+                    </td>
                     <td>{{ $book->id }}</td>
                     <td>{{ $book->title }}</td>
                     <td>{{ $book->author->name }}</td>
@@ -55,7 +65,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="4">Nenhum livro encontrado.</td>
+                    <td colspan="5">Nenhum livro encontrado.</td>
                 </tr>
             @endforelse
         </tbody>

@@ -4,7 +4,22 @@
 <div class="container">
     <h1 class="my-4">Detalhes do Livro</h1>
 
-    <div class="card">
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            @if($book->cover_path)
+                <img src="{{ $book->cover_url }}" alt="Capa do livro" class="img-fluid rounded shadow" style="max-height: 400px; width: auto;">
+            @else
+                <div class="bg-light rounded shadow d-flex align-items-center justify-content-center" style="height: 300px; border: 2px dashed #ccc;">
+                    <div class="text-center text-muted">
+                        <i class="bi bi-image" style="font-size: 3rem;"></i>
+                        <p class="mt-2">Sem capa</p>
+                    </div>
+                </div>
+            @endif
+        </div>
+     <div class="col-md-8">
+
+        <div class="card">
         <div class="card-header">
             <strong>Título:</strong> {{ $book->title }}
         </div>
@@ -30,7 +45,10 @@
     <a href="{{ route('books.index') }}" class="btn btn-secondary mt-3">
         <i class="bi bi-arrow-left"></i> Voltar
     </a>
+    </div>
 </div>
+
+
 <!-- Formulário para Empréstimos -->
 <div class="card mb-4">
     <div class="card-header">Registrar Empréstimo</div>

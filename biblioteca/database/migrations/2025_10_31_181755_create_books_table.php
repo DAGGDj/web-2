@@ -15,6 +15,7 @@ class CreateBooksTable extends Migration
             $table->foreignId('category_id')->constrained()->onDelete('cascade');
             $table->foreignId('publisher_id')->constrained()->onDelete('cascade');
             $table->integer('published_year')->nullable();
+            $table->string('cover_path')->nullable();
             $table->timestamps();
         });
     }
