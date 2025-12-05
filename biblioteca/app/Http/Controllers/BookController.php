@@ -9,18 +9,23 @@ use App\Models\Category;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Support\Facades\Storage;
+use App\Policies\BookPolicy;
 
 class BookController extends Controller
 {
     // Formulário com input de ID
     public function createWithId()
     {
+        $this->authorize('create', Book::class);
+        
         return view('books.create-id');
     }
 
     // Salvar livro com input de ID
     public function storeWithId(Request $request)
     {
+        $this->authorize('create', Book::class);
+        
         $request->validate([
             'title' => 'required|string|max:255',
             'publisher_id' => 'required|exists:publishers,id',
@@ -45,6 +50,8 @@ class BookController extends Controller
     // Formulário com input select
     public function createWithSelect()
     {
+         $this->authorize('create', Book::class);
+        
         $publishers = Publisher::all();
         $authors = Author::all();
         $categories = Category::all();
@@ -55,6 +62,8 @@ class BookController extends Controller
     // Salvar livro com input select
     public function storeWithSelect(Request $request)
     {
+        $this->authorize('create', Book::class);
+        
         $request->validate([
             'title' => 'required|string|max:255',
             'publisher_id' => 'required|exists:publishers,id',
@@ -78,6 +87,8 @@ class BookController extends Controller
     // Editar livro
     public function edit(Book $book)
     {
+        $this->authorize('update', $book);
+        
         $publishers = Publisher::all();
         $authors = Author::all();
         $categories = Category::all();
@@ -88,6 +99,8 @@ class BookController extends Controller
     public function update(Request $request, Book $book)
 {
 
+    $this->authorize('update', $book);
+    
     $request->validate([
         'title' => 'required|string|max:255',
         'publisher_id' => 'required|exists:publishers,id',
@@ -142,6 +155,8 @@ public function show(Book $book)
 
 public function destroy(Book $book)
 {
+    $this->authorize('delete', $book);
+    
     if ($book->cover_path && Storage::disk('public')->exists($book->cover_path)) {
         Storage::disk('public')->delete($book->cover_path);
     }

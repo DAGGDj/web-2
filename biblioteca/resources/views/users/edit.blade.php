@@ -18,6 +18,18 @@
             <input type="email" class="form-control" id="email" name="email" value="{{ old('email', $user->email) }}" required>
         </div>
 
+        @can('changeRole', $user)
+            <div class="mb-3">
+                <label for="role" class="form-label">Papel do Usuário</label>
+                <select name="role" id="role" class="form-control" required>
+                    <option value="admin" {{ $user->role === 'admin' ? 'selected' : '' }}>Administrador</option>
+                    <option value="bibliotecario" {{ $user->role === 'bibliotecario' ? 'selected' : '' }}>Bibliotecário</option>
+                    <option value="cliente" {{ $user->role === 'cliente' ? 'selected' : '' }}>Cliente</option>
+                </select>
+                <small class="text-muted">Apenas administradores podem alterar papéis.</small>
+            </div>
+        @endcan
+
         <button type="submit" class="btn btn-success">Salvar</button>
         <a href="{{ route('users.index') }}" class="btn btn-secondary">Cancelar</a>
     </form>

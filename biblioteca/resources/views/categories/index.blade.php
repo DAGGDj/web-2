@@ -4,9 +4,11 @@
 <div class="container">
     <h1 class="my-4">Lista de Categorias</h1>
 
+    @can('create', App\Models\Category::class)
     <a href="{{ route('categories.create') }}" class="btn btn-success mb-3">
         <i class="bi bi-plus"></i> Adicionar Categoria
     </a>
+    @endcan
 
     @if(session('success'))
         <div class="alert alert-success">
@@ -34,18 +36,22 @@
                         </a>
 
                         <!-- Botão de Editar -->
+                        @can('update', $category)
                         <a href="{{ route('categories.edit', $category) }}" class="btn btn-primary btn-sm">
                             <i class="bi bi-pencil"></i> Editar
                         </a>
+                        @endcan
 
                         <!-- Botão de Excluir -->
-                        <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display: inline;">
+                         @can('delete', $category)
+                         <form action="{{ route('categories.destroy', $category) }}" method="POST" style="display: inline;">
                             @csrf
                             @method('DELETE')
                             <button class="btn btn-danger btn-sm" onclick="return confirm('Deseja excluir esta categoria?')">
                                 <i class="bi bi-trash"></i> Excluir
                             </button>
                         </form>
+                        @endcan
                     </td>
                 </tr>
             @empty
