@@ -42,5 +42,13 @@ class Book extends Model
                 ->withTimestamps();
 }
 
+public function isAvailable()
+    {
+        
+        return !$this->users()
+                    ->wherePivotNull('returned_at')
+                    ->exists();
+    }
+
 
 }

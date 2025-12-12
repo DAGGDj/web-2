@@ -15,6 +15,12 @@ class BorrowingController extends Controller
         'user_id' => 'required|exists:users,id',
     ]);
 
+    if (!$book->isAvailable()) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Este livro já está emprestado e não pode ser emprestado novamente.');
+        }
+
     Borrowing::create([
         'user_id' => $request->user_id,
         'book_id' => $book->id,
@@ -25,6 +31,8 @@ class BorrowingController extends Controller
 }
 public function returnBook(Borrowing $borrowing)
 {
+    $this->authorize('return', $borrowing);
+    
     $borrowing->update([
         'returned_at' => now(),
     ]);
@@ -33,6 +41,8 @@ public function returnBook(Borrowing $borrowing)
 }
 public function userBorrowings(User $user)
 {
+    $this->authorize('viewBorrowings', $user);
+    
     $borrowings = $user->books()->withPivot('borrowed_at', 'returned_at')->get();
 
     return view('users.borrowings', compact('user', 'borrowings'));
