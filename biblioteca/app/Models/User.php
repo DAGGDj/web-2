@@ -50,7 +50,32 @@ class User extends Authenticatable
     return $this->belongsToMany(Book::class, 'borrowings')
                 ->withPivot('id', 'borrowed_at', 'returned_at')
                 ->withTimestamps();
+
 }
+
+public function borrowings()
+    {
+        return $this->hasMany(Borrowing::class);
+    }
+
+    
+    public function getActiveBorrowingsCount()
+    {
+        return $this->borrowings()
+                    ->whereNull('returned_at')
+                    ->count();
+    }
+
+    public function canBorrowMoreBooks()
+    {
+        return $this->getActiveBorrowingsCount() < 5;
+    }
+
+    public function getRemainingBorrowingSlots()
+    {
+        $remaining = 5 - $this->getActiveBorrowingsCount();
+        return max(0, $remaining); 
+    }
 
 
 }

@@ -20,6 +20,14 @@ class BorrowingController extends Controller
                 ->withInput()
                 ->with('error', 'Este livro já está emprestado e não pode ser emprestado novamente.');
         }
+        $user = User::find($request->user_id);
+        
+        if (!$user->canBorrowMoreBooks()) {
+            $activeCount = $user->getActiveBorrowingsCount();
+            return redirect()->back()
+                ->withInput()
+                ->with('error', "Este usuário já tem {$activeCount} livro(s) emprestados e atingiu o limite máximo de 5 livros simultâneos.");
+        }
 
     Borrowing::create([
         'user_id' => $request->user_id,

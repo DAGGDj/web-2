@@ -58,15 +58,90 @@
                 @csrf
                 <div class="mb-3">
                     <label for="user_id" class="form-label">Usuário</label>
-                    <select class="form-select" id="user_id" name="user_id" required>
+                    <select class="form-select @error('user_id') is-invalid @enderror" id="user_id" name="user_id" required>
                         <option value="" selected>Selecione um usuário</option>
                         @foreach($users as $user)
-                            <option value="{{ $user->id }}">{{ $user->name }}</option>
+                            @php
+                                $activeCount = $user->getActiveBorrowingsCount();
+                                $canBorrow = $user->canBorrowMoreBooks();
+                                $statusClass = $canBorrow ? 'text-success' : 'text-danger';
+                                $statusIcon = $canBorrow ? '✓' : '✗';
+                            @endphp
+                            <option value="{{ $user->id }}" 
+                                    data-borrowed="{{ $activeCount }}"
+                                    data-canborrow="{{ $canBorrow ? '1' : '0' }}"
+                                    class="{{ !$canBorrow ? 'text-danger' : '' }}"
+                                    {{ old('user_id') == $user->id ? 'selected' : '' }}>
+                                {{ $user->name }} 
+                                <small class="{{ $statusClass }}">
+                                    ({{ $statusIcon }} {{ $activeCount }}/5 livros)
+                                </small>
+                            </option>
                         @endforeach
                     </select>
+                    
+                    <!-- Mensagem de status do usuário selecionado -->
+                    <div id="userStatus" class="mt-2 small" style="display: none;">
+                        <!-- Será preenchido via JavaScript abaixo -->
+                    </div>
+                    
+                    @error('user_id')
+                        <div class="invalid-feedback">{{ $message }}</div>
+                    @enderror
                 </div>
                 <button type="submit" class="btn btn-success">Registrar Empréstimo</button>
             </form>
+            
+            <!-- Adicione este script no final do formulário -->
+            <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const userSelect = document.getElementById('user_id');
+                const userStatus = document.getElementById('userStatus');
+                
+                function updateUserStatus() {
+                    const selectedOption = userSelect.options[userSelect.selectedIndex];
+                    
+                    if (!selectedOption.value) {
+                        userStatus.style.display = 'none';
+                        return;
+                    }
+                    
+                    const borrowed = parseInt(selectedOption.getAttribute('data-borrowed'));
+                    const canBorrow = selectedOption.getAttribute('data-canborrow') === '1';
+                    const remaining = 5 - borrowed;
+                    
+                    if (canBorrow) {
+                        userStatus.innerHTML = `
+                            <span class="text-success">
+                                <i class="bi bi-check-circle"></i> 
+                                Este usuário tem <strong>${borrowed}</strong> livro(s) emprestado(s) 
+                                e pode pegar mais <strong>${remaining}</strong> livro(s).
+                            </span>
+                        `;
+                        userStatus.className = 'mt-2 small text-success';
+                    } else {
+                        userStatus.innerHTML = `
+                            <span class="text-danger">
+                                <i class="bi bi-exclamation-triangle"></i> 
+                                Este usuário já tem <strong>${borrowed}</strong> livro(s) emprestado(s) 
+                                e <strong>atingiu o limite máximo</strong> de 5 livros.
+                            </span>
+                        `;
+                        userStatus.className = 'mt-2 small text-danger';
+                    }
+                    
+                    userStatus.style.display = 'block';
+                }
+                
+                // Atualiza status quando o usuário muda a seleção
+                userSelect.addEventListener('change', updateUserStatus);
+                
+                // Atualiza status inicial se já tiver um valor selecionado
+                if (userSelect.value) {
+                    updateUserStatus();
+                }
+            });
+            </script>
         </div>
     </div>
 @else
