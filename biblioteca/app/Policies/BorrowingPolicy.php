@@ -33,5 +33,45 @@ class BorrowingPolicy
            $user->role === 'admin' || 
            $user->role === 'bibliotecario';
 }
+
+/**
+     * Determina se o usuário pode ver a lista de débitos
+     */
+    public function viewDebts(User $user): bool
+    {
+        return $user->role === 'bibliotecario' || $user->role === 'admin';
+    }
+
+    /**
+     * Determina se o usuário pode quitar débitos
+     */
+    public function payDebt(User $user): bool
+    {
+        return $user->role === 'bibliotecario' || $user->role === 'admin';
+    }
+
+    /**
+     * Determina se o usuário pode ajustar débitos manualmente
+     */
+    public function adjustDebt(User $user): bool
+    {
+        return $user->role === 'admin'; // Apenas admin pode ajustar manualmente
+    }
+
+    /**
+     * Determina se o usuário pode ver qualquer empréstimo (para listagens)
+     */
+    public function viewAny(User $user): bool
+    {
+        return $user->role === 'bibliotecario' || $user->role === 'admin';
+    }
+
+    /**
+     * Determina se o usuário pode atualizar/gerenciar empréstimos
+     */
+    public function update(User $user): bool
+    {
+        return $user->role === 'bibliotecario' || $user->role === 'admin';
+    }
     
 }

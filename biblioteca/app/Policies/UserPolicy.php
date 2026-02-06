@@ -9,13 +9,13 @@ class UserPolicy
     // Ver todos usuários
     public function viewAny(User $user): bool
     {
-        return $user->role === 'admin';
+        return $user->role === 'admin' || $user->role === 'bibliotecario';
     }
     
     // Ver um usuário
     public function view(User $user, User $model): bool
     {
-        return $user->role === 'admin' || $user->id === $model->id;
+        return $user->role === 'admin' || $user->role === 'bibliotecario' || $user->id === $model->id;
     }
     
     // Criar usuário

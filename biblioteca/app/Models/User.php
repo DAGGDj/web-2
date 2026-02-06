@@ -21,6 +21,7 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
+        'debit',
     ];
 
     /**
@@ -43,6 +44,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'debit' => 'decimal:2',
         ];
     }
     public function books()
@@ -76,6 +78,43 @@ public function borrowings()
         $remaining = 5 - $this->getActiveBorrowingsCount();
         return max(0, $remaining); 
     }
+
+     public function hasDebt()
+    {
+        return $this->debit > 0;
+    }
+
+   
+    public function addDebt($amount)
+    {
+        $this->debit += $amount;
+        $this->save();
+    }
+
+    
+    public function clearDebt()
+    {
+        $this->debit = 0;
+        $this->save();
+    }
+
+    
+    public function canBorrow()
+    {
+        return !$this->hasDebt() && $this->canBorrowMoreBooks();
+    }
+
+    
+    public function getOverdueBorrowings()
+    {
+        return $this->borrowings()
+                    ->whereNull('returned_at')
+                    ->get()
+                    ->filter(function($borrowing) {
+                        return $borrowing->is_overdue;
+                    });
+    }
+
 
 
 }

@@ -18,9 +18,21 @@ class UserController extends Controller
 
     public function show(\App\Models\User $user)
     {
+         $user->load('books');
          $this->authorize('view', $user);
         
-        return view('users.show', compact('user'));
+        // Carrega informações de débitos e empréstimos
+    $borrowingsWithFine = $user->borrowings()
+        ->whereNotNull('returned_at')
+        ->get()
+        ->filter(function($borrowing) {
+            return $borrowing->has_fine;
+        });
+    
+    $overdueBorrowings = $user->getOverdueBorrowings();
+    $activeBorrowings = $user->borrowings()->whereNull('returned_at')->get();
+    
+    return view('users.show', compact('user', 'borrowingsWithFine', 'overdueBorrowings', 'activeBorrowings'));
     }
 
     public function edit(\App\Models\User $user)

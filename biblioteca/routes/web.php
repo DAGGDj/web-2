@@ -47,3 +47,22 @@ Route::get('/users/{user}/borrowings', [BorrowingController::class, 'userBorrowi
 
 // Rota para registrar a devolução
 Route::patch('/borrowings/{borrowing}/return', [BorrowingController::class, 'returnBook'])->name('borrowings.return');
+
+// Rotas para gestão de débitos
+Route::middleware(['auth'])->group(function () {
+    // Lista de usuários com débito
+    Route::get('/users-with-debt', [BorrowingController::class, 'usersWithDebt'])
+        ->name('users.with.debt');
+    
+    // Detalhes do débito de um usuário
+    Route::get('/users/{user}/debt-details', [BorrowingController::class, 'userDebtDetails'])
+        ->name('user.debt.details');
+    
+    // Registrar pagamento (zerar débito)
+    Route::post('/users/{user}/pay-debt', [BorrowingController::class, 'payDebt'])
+        ->name('user.pay.debt');
+    
+    // Ajustar débito manualmente
+    Route::post('/users/{user}/adjust-debt', [BorrowingController::class, 'adjustDebt'])
+        ->name('user.adjust.debt'); // ESTA É A ROTA QUE ESTÁ FALTANDO
+});
